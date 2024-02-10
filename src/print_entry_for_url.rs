@@ -84,6 +84,8 @@ fn guess_artifact_format_from_url(url: &[u8]) -> ArtifactFormat {
         ArtifactFormat::TarGz
     } else if url.ends_with(b".tar.zst") || url.ends_with(b".tzst") {
         ArtifactFormat::TarZstd
+    } else if url.ends_with(b".tar.xz") || url.ends_with(b".txz") {
+        ArtifactFormat::TarXz
     } else if url.ends_with(b".tar") {
         ArtifactFormat::Tar
     } else if url.ends_with(b".gz") {
