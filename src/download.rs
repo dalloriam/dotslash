@@ -228,6 +228,12 @@ fn unpack_verified_artifact(
             let archive = Archive::new(decoder);
             decompress::unpack(archive, temp_dir_to_mv)?;
         }
+        (Some(DecompressStep::Xz), Some(ArchiveFormat::Tar)) => {
+            let xz_file = fs_ctx::file_open(fetched_artifact)?;
+            let mut decoder = xz2::read::XzDecoder::new(xz_file);
+            let archive = Archive::new(&mut decoder);
+            decompress::unpack(archive, temp_dir_to_mv)?;
+        }
         (decompression, None) => {
             let final_artifact_path = temp_dir_to_mv.join(artifact_entry_path);
             let parent = final_artifact_path.parent().unwrap();
@@ -249,6 +255,14 @@ fn unpack_verified_artifact(
                     let zst_file = fs_ctx::file_open(fetched_artifact)?;
                     let reader = BufReader::new(zst_file);
                     let mut decoder = Decoder::new(reader)?;
+                    let output_file = fs_ctx::file_create(&final_artifact_path)?;
+                    let mut writer = BufWriter::new(output_file);
+                    std::io::copy(&mut decoder, &mut writer)?;
+                }
+                Some(DecompressStep::Xz) => {
+                    // fetched_artifact contains the .xz
+                    let xz_file = fs_ctx::file_open(fetched_artifact)?;
+                    let mut decoder = xz2::read::XzDecoder::new(xz_file);
                     let output_file = fs_ctx::file_create(&final_artifact_path)?;
                     let mut writer = BufWriter::new(output_file);
                     std::io::copy(&mut decoder, &mut writer)?;

@@ -105,6 +105,7 @@ fn create_key_for_format(entry: &ArtifactEntry) -> Cow<'_, str> {
                 None => Cow::Borrowed("tar"),
                 Some(DecompressStep::Gzip) => Cow::Borrowed("tar.gz"),
                 Some(DecompressStep::Zstd) => Cow::Borrowed("tar.zst"),
+                Some(DecompressStep::Xz) => Cow::Borrowed("tar.xz"),
             }
         }
         (decompress, None) => {
@@ -116,6 +117,7 @@ fn create_key_for_format(entry: &ArtifactEntry) -> Cow<'_, str> {
                 None => Cow::Owned(format!("file:{}", path)),
                 Some(DecompressStep::Gzip) => Cow::Owned(format!("file.gz:{}", path)),
                 Some(DecompressStep::Zstd) => Cow::Owned(format!("file.zst:{}", path)),
+                Some(DecompressStep::Xz) => Cow::Owned(format!("file.xz:{}", path)),
             }
         }
     }
